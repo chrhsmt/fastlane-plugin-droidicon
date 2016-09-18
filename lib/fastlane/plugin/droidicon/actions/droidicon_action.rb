@@ -26,16 +26,13 @@ module Fastlane
 
         FileUtils.mkdir_p(basepath)
 
-        self.needed_icons[:android].each do |scale, sizes|
-          sizes.each do |size|
-            width, height = size.split('x').map { |v| v.to_f * scale.to_i }
+        self.needed_icons[:android].each do |scale, size|
+          width, height = size.split('x').map { |v| v.to_f * scale.to_i }
 
-            image = MiniMagick::Image.open(fname)
-            image.format 'png'
-            image.resize "#{width}x#{height}"
-            image.write File.join(basepath, scale, params[:generated_file_name])
-
-          end
+          image = MiniMagick::Image.open(fname)
+          image.format 'png'
+          image.resize "#{width}x#{height}"
+          image.write File.join(basepath, scale, params[:generated_file_name])
         end
 
         UI.success("Successfully stored app icon at '#{basepath}'")
