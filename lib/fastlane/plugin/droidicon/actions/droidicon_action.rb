@@ -14,7 +14,6 @@ module Fastlane
       end
       def self.run(params)
         fname = params[:appicon_image_file]
-        basename = File.basename(fname, File.extname(fname))
         basepath = Pathname.new("#{params[:res_path]}")
 
         require 'mini_magick'
@@ -27,8 +26,9 @@ module Fastlane
         FileUtils.mkdir_p(basepath)
 
         self.needed_icons[:android].each do |scale, size|
-          width, height = size.split('x').map { |v| v.to_f * scale.to_i }
+          width, height = size.split('x').map { |v| v.to_f }
 
+          FileUtils.mkdir_p(File.join(basepath, scale))
           image = MiniMagick::Image.open(fname)
           image.format 'png'
           image.resize "#{width}x#{height}"
@@ -70,7 +70,6 @@ module Fastlane
 
       def self.is_supported?(platform)
         [:android].include?(platform)
-        true
       end
     end
   end
