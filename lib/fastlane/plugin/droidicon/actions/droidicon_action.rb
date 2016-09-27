@@ -25,14 +25,22 @@ module Fastlane
 
         FileUtils.mkdir_p(basepath)
 
-        self.needed_icons[:android].each do |scale, size|
+        process = lambda do | size, path |
           width, height = size.split('x').map { |v| v.to_f }
 
-          FileUtils.mkdir_p(File.join(basepath, scale))
+          FileUtils.mkdir_p(path)
           image = MiniMagick::Image.open(fname)
           image.format 'png'
           image.resize "#{width}x#{height}"
-          image.write File.join(basepath, scale, params[:generated_file_name])
+          image.write File.join(path, params[:generated_file_name])
+        end
+
+        if params[:size]
+          process.call(params[:size], basepath)
+        else
+          self.needed_icons[:android].each do |scale, size|
+            process.call(size, File.join(basepath, scale))
+          end
         end
 
         UI.success("Successfully stored app icon at '#{basepath}'")
@@ -63,6 +71,12 @@ module Fastlane
                                   env_name: "RES_PATH",
                              default_value: File.join("app", "src", "main", "res"),
                                description: "Path to the Resouce for the generated iconset",
+                                  optional: true,
+                                      type: String),
+          FastlaneCore::ConfigItem.new(key: :size,
+                                  env_name: "SIZE",
+                             default_value: "512x512",
+                               description: "Assign a size option",
                                   optional: true,
                                       type: String)
         ]
