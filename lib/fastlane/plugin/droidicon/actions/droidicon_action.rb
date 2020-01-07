@@ -13,6 +13,7 @@ module Fastlane
         }
       end
       def self.run(params)
+        UI.message('====== run DroidiconAction ======')
         fname = params[:appicon_image_file]
         basepath = Pathname.new("#{params[:res_path]}")
 
@@ -37,12 +38,15 @@ module Fastlane
 
         if params[:size]
           process.call(params[:size], basepath)
-        else
-          self.needed_icons[:android].each do |scale, size|
-            process.call(size, File.join(basepath, scale))
-          end
         end
 
+        if basepath.to_s == available_options[2].code_gen_default_value
+          self.needed_icons[:android].each do |scale, size|
+            destinaiton = File.join(basepath, scale)
+            UI.message("processing: #{scale}, #{size}, to #{destinaiton}")
+            process.call(size, destinaiton)
+          end
+        end
         UI.success("Successfully stored app icon at '#{basepath}'")
       end
 
